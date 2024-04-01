@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Friend Information</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #cfcb5c85;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+  }
+
+  h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+  }
+
+  #friendInputs {
+    margin-bottom: 20px;
+  }
+
+  .friend-input {
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  #result {
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: none;
+  }
+
+  button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin: 5px;
+  }
+
+  button:hover {
+    background-color: #0056b3;
+  }
+</style>
+</head>
+<body>
+  <h1>Friend Information</h1>
+  <div id="friendCount"></div>
+  <div id="friendInputs"></div>
+  <div id="result"></div>
+  
+  <script>
+    // Function to generate random integer between min and max (inclusive)
+    function getRandomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // Function to handle adding friend inputs dynamically
+    function addFriendInputs(count) {
+      var friendInputsDiv = document.getElementById("friendInputs");
+      friendInputsDiv.innerHTML = ""; // Clear previous inputs
+      
+      for (var i = 0; i < count; i++) {
+        var friendNumber = i + 1;
+        var friendName = prompt("Enter nickname for friend " + friendNumber + ":");
+        
+        // Validate friend name input
+        while (friendName.trim() === "") {
+          friendName = prompt("Nickname cannot be empty. Please enter nickname for friend " + friendNumber + ":");
+        }
+        
+        var friendAge = parseInt(prompt("Enter age for friend " + friendNumber + ":"));
+        
+        // Validate age input
+        while (isNaN(friendAge)) {
+          friendAge = parseInt(prompt("Invalid input. Please enter a valid age for friend " + friendNumber + ":"));
+        }
+        
+        // Create input fields
+        var inputField = document.createElement("div");
+        inputField.classList.add("friend-input");
+        inputField.innerHTML = "Friend " + friendNumber + ": " + friendName + ", Age: " + friendAge;
+        friendInputsDiv.appendChild(inputField);
+      }
+    }
+
+    // Function to calculate total age of all friends
+    function calculateTotalAge() {
+      var totalAge = 0;
+      var friendInputs = document.getElementById("friendInputs").children;
+      for (var i = 0; i < friendInputs.length; i++) {
+        var age = parseInt(friendInputs[i].innerText.match(/Age: (\d+)/)[1]);
+        totalAge += age;
+      }
+      return totalAge;
+    }
+
+    // Function to calculate average age of friends
+    function calculateAverageAge() {
+      var totalAge = calculateTotalAge();
+      var friendCount = document.getElementById("friendInputs").children.length;
+      return totalAge / friendCount;
+    }
+
+    // Function to find youngest friend(s)
+    function findYoungestFriend() {
+      var minAge = Infinity;
+      var youngestFriends = [];
+      var friendInputs = document.getElementById("friendInputs").children;
+      
+      for (var i = 0; i < friendInputs.length; i++) {
+        var age = parseInt(friendInputs[i].innerText.match(/Age: (\d+)/)[1]);
+        if (age < minAge) {
+          minAge = age;
+          youngestFriends = [friendInputs[i].innerText];
+        } else if (age === minAge) {
+          youngestFriends.push(friendInputs[i].innerText);
+        }
+      }
+      
+      return youngestFriends;
+    }
+
+    // Function to find oldest friend(s)
+    function findOldestFriend() {
+      var maxAge = -Infinity;
+      var oldestFriends = [];
+      var friendInputs = document.getElementById("friendInputs").children;
+      
+      for (var i = 0; i < friendInputs.length; i++) {
+        var age = parseInt(friendInputs[i].innerText.match(/Age: (\d+)/)[1]);
+        if (age > maxAge) {
+          maxAge = age;
+          oldestFriends = [friendInputs[i].innerText];
+        } else if (age === maxAge) {
+          oldestFriends.push(friendInputs[i].innerText);
+        }
+      }
+      
+      return oldestFriends;
+    }
+
+    // Function to handle user input and perform selected action
+    function performAction() {
+      var action = parseInt(prompt("Select an action:\n1. Calculate total age of all friends\n2. Calculate average age of friends\n3. Find youngest friend(s)\n4. Find oldest friend(s)"));
+      
+      switch (action) {
+        case 1:
+          var totalAge = calculateTotalAge();
+          document.getElementById("result").innerText = "Total age of all friends: " + totalAge;
+          document.getElementById("result").style.display = "block";
+          break;
+        case 2:
+          var averageAge = calculateAverageAge();
+          document.getElementById("result").innerText = "Average age of friends: " + averageAge.toFixed(2);
+          document.getElementById("result").style.display = "block";
+          break;
+        case 3:
+          var youngestFriends = findYoungestFriend();
+          document.getElementById("result").innerText = "Youngest friend(s):\n" + youngestFriends.join("\n");
+          document.getElementById("result").style.display = "block";
+          break;
+        case 4:
+          var oldestFriends = findOldestFriend();
+          document.getElementById("result").innerText = "Oldest friend(s):\n" + oldestFriends.join("\n");
+          document.getElementById("result").style.display = "block";
+          break;
+        default:
+          alert("Invalid action. Please select a valid action.");
+      }
+    }
+
+    // Function to reset the page
+    function resetPage() {
+      document.getElementById("friendInputs").innerHTML = "";
+      document.getElementById("result").innerText = "";
+      document.getElementById("result").style.display = "none";
+      var friendCount = getRandomInt(1, 9);
+      document.getElementById("friendCount").innerText = "Number of friends: " + friendCount;
+      addFriendInputs(friendCount);
+    }
+
+    // Function to start the process
+    function startProcess() {
+      var friendCount = getRandomInt(1, 9);
+      document.getElementById("friendCount").innerText = "Number of friends: " + friendCount;
+      addFriendInputs(friendCount);
+    }
+  </script>
+  
+  <button onclick="startProcess()">Start Adding Friends</button>
+  <button onclick="performAction()">Perform Action</button>
+  <button onclick="resetPage()">Reset</button>
+</body>
+</html>
